@@ -16,12 +16,12 @@ API REST simples para gerir tarefas, feita com Node.js e Express, como primeiro 
 
 ## Endpoints
 
-| Método | Rota | Descrição |
-|---|---|---|
-| `GET` | `/tarefas` | Devolve todas as tarefas |
-| `POST` | `/tarefas` | Cria uma nova tarefa (body: `{ "texto": "..." }`) |
-| `PUT` | `/tarefas/:id` | Alterna o estado `concluida` da tarefa com esse id |
-| `DELETE` | `/tarefas/:id` | Apaga a tarefa com esse id |
+| Método   | Rota           | Descrição                                          |
+| -------- | -------------- | -------------------------------------------------- |
+| `GET`    | `/tarefas`     | Devolve todas as tarefas                           |
+| `POST`   | `/tarefas`     | Cria uma nova tarefa (body: `{ "texto": "..." }`)  |
+| `PUT`    | `/tarefas/:id` | Alterna o estado `concluida` da tarefa com esse id |
+| `DELETE` | `/tarefas/:id` | Apaga a tarefa com esse id                         |
 
 ## Conceitos praticados
 

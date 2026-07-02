@@ -23,7 +23,8 @@ app.post("/tarefas", function (pedido, resposta) {
   tarefas.push(novaTarefa);
   resposta.status(201).json(novaTarefa);
 });
-app.delete('/tarefas/:id', function (pedido, resposta) {
+
+app.delete("/tarefas/:id", function (pedido, resposta) {
   const id = Number(pedido.params.id);
 
   tarefas = tarefas.filter(function (tarefa) {
@@ -33,7 +34,7 @@ app.delete('/tarefas/:id', function (pedido, resposta) {
   resposta.status(204).send();
 });
 
-app.put('/tarefas/:id', function (pedido, resposta) {
+app.put("/tarefas/:id", function (pedido, resposta) {
   const id = Number(pedido.params.id);
 
   const tarefa = tarefas.find(function (tarefa) {
@@ -41,7 +42,7 @@ app.put('/tarefas/:id', function (pedido, resposta) {
   });
 
   if (!tarefa) {
-    resposta.status(404).json({ erro: 'Tarefa não encontrada' });
+    resposta.status(404).json({ erro: "Tarefa não encontrada" });
     return;
   }
 
