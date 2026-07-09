@@ -1,53 +1,73 @@
 const express = require("express");
+const db = require("./db");
+
 const app = express();
 const PORTA = 3000;
 
 app.use(express.json());
 
-let tarefas = [
-  { id: 1, texto: "Aprender Express", concluida: false },
-  { id: 2, texto: "Criar a primeira API", concluida: true },
-];
-
-app.get("/tarefas", function (pedido, resposta) {
-  resposta.json(tarefas);
-});
-
-app.post("/tarefas", function (pedido, resposta) {
-  const novaTarefa = {
-    id: tarefas.length + 1,
-    texto: pedido.body.texto,
-    concluida: false,
+// Converte uma linha da BD (concluida: 0/1) para o formato da API (concluida: true/false)
+function formatarTarefa(linha) {
+  return {
+    id: linha.id,
+    texto: linha.texto,
+    concluida: Boolean(linha.concluida),
   };
+}
 
-  tarefas.push(novaTarefa);
-  resposta.status(201).json(novaTarefa);
+// LER todas as tarefas
+app.get("/tarefas", function (pedido, resposta) {
+  const linhas = db.prepare("SELECT * FROM tarefas ORDER BY id").all();
+  resposta.json(linhas.map(formatarTarefa));
 });
 
-app.delete("/tarefas/:id", function (pedido, resposta) {
-  const id = Number(pedido.params.id);
+// CRIAR uma nova tarefa
+app.post("/tarefas", function (pedido, resposta) {
+  const texto = pedido.body.texto;
 
-  tarefas = tarefas.filter(function (tarefa) {
-    return tarefa.id !== id;
-  });
+  if (!texto || texto.trim() === "") {
+    return resposta.status(400).json({ erro: "O texto é obrigatório" });
+  }
 
-  resposta.status(204).send();
+  const resultado = db
+    .prepare("INSERT INTO tarefas (texto, concluida) VALUES (?, 0)")
+    .run(texto.trim());
+
+  const novaTarefa = db
+    .prepare("SELECT * FROM tarefas WHERE id = ?")
+    .get(resultado.lastInsertRowid);
+
+  resposta.status(201).json(formatarTarefa(novaTarefa));
 });
 
+// ALTERNAR o estado concluida
 app.put("/tarefas/:id", function (pedido, resposta) {
   const id = Number(pedido.params.id);
 
-  const tarefa = tarefas.find(function (tarefa) {
-    return tarefa.id === id;
-  });
+  const tarefa = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(id);
 
   if (!tarefa) {
-    resposta.status(404).json({ erro: "Tarefa não encontrada" });
-    return;
+    return resposta.status(404).json({ erro: "Tarefa não encontrada" });
   }
 
-  tarefa.concluida = !tarefa.concluida;
-  resposta.json(tarefa);
+  const novoEstado = tarefa.concluida ? 0 : 1;
+  db.prepare("UPDATE tarefas SET concluida = ? WHERE id = ?").run(novoEstado, id);
+
+  const atualizada = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(id);
+  resposta.json(formatarTarefa(atualizada));
+});
+
+// APAGAR uma tarefa
+app.delete("/tarefas/:id", function (pedido, resposta) {
+  const id = Number(pedido.params.id);
+
+  const resultado = db.prepare("DELETE FROM tarefas WHERE id = ?").run(id);
+
+  if (resultado.changes === 0) {
+    return resposta.status(404).json({ erro: "Tarefa não encontrada" });
+  }
+
+  resposta.status(204).send();
 });
 
 app.listen(PORTA, function () {
