@@ -2,74 +2,74 @@ const express = require("express");
 const db = require("./db");
 
 const app = express();
-const PORTA = 3000;
+const PORT = 3000;
 
 app.use(express.json());
 
-// Converte uma linha da BD (concluida: 0/1) para o formato da API (concluida: true/false)
-function formatarTarefa(linha) {
+// Converts a DB row (completed: 0/1) to the API format (completed: true/false)
+function formatTask(row) {
   return {
-    id: linha.id,
-    texto: linha.texto,
-    concluida: Boolean(linha.concluida),
+    id: row.id,
+    text: row.text,
+    completed: Boolean(row.completed),
   };
 }
 
-// LER todas as tarefas
-app.get("/tarefas", function (pedido, resposta) {
-  const linhas = db.prepare("SELECT * FROM tarefas ORDER BY id").all();
-  resposta.json(linhas.map(formatarTarefa));
+// READ all tasks
+app.get("/tasks", function (req, res) {
+  const rows = db.prepare("SELECT * FROM tasks ORDER BY id").all();
+  res.json(rows.map(formatTask));
 });
 
-// CRIAR uma nova tarefa
-app.post("/tarefas", function (pedido, resposta) {
-  const texto = pedido.body.texto;
+// CREATE a new task
+app.post("/tasks", function (req, res) {
+  const text = req.body.text;
 
-  if (!texto || texto.trim() === "") {
-    return resposta.status(400).json({ erro: "O texto é obrigatório" });
+  if (!text || text.trim() === "") {
+    return res.status(400).json({ error: "Text is required" });
   }
 
-  const resultado = db
-    .prepare("INSERT INTO tarefas (texto, concluida) VALUES (?, 0)")
-    .run(texto.trim());
+  const result = db
+    .prepare("INSERT INTO tasks (text, completed) VALUES (?, 0)")
+    .run(text.trim());
 
-  const novaTarefa = db
-    .prepare("SELECT * FROM tarefas WHERE id = ?")
-    .get(resultado.lastInsertRowid);
+  const newTask = db
+    .prepare("SELECT * FROM tasks WHERE id = ?")
+    .get(result.lastInsertRowid);
 
-  resposta.status(201).json(formatarTarefa(novaTarefa));
+  res.status(201).json(formatTask(newTask));
 });
 
-// ALTERNAR o estado concluida
-app.put("/tarefas/:id", function (pedido, resposta) {
-  const id = Number(pedido.params.id);
+// TOGGLE the completed state
+app.put("/tasks/:id", function (req, res) {
+  const id = Number(req.params.id);
 
-  const tarefa = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(id);
+  const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
 
-  if (!tarefa) {
-    return resposta.status(404).json({ erro: "Tarefa não encontrada" });
+  if (!task) {
+    return res.status(404).json({ error: "Task not found" });
   }
 
-  const novoEstado = tarefa.concluida ? 0 : 1;
-  db.prepare("UPDATE tarefas SET concluida = ? WHERE id = ?").run(novoEstado, id);
+  const newState = task.completed ? 0 : 1;
+  db.prepare("UPDATE tasks SET completed = ? WHERE id = ?").run(newState, id);
 
-  const atualizada = db.prepare("SELECT * FROM tarefas WHERE id = ?").get(id);
-  resposta.json(formatarTarefa(atualizada));
+  const updated = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
+  res.json(formatTask(updated));
 });
 
-// APAGAR uma tarefa
-app.delete("/tarefas/:id", function (pedido, resposta) {
-  const id = Number(pedido.params.id);
+// DELETE a task
+app.delete("/tasks/:id", function (req, res) {
+  const id = Number(req.params.id);
 
-  const resultado = db.prepare("DELETE FROM tarefas WHERE id = ?").run(id);
+  const result = db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
 
-  if (resultado.changes === 0) {
-    return resposta.status(404).json({ erro: "Tarefa não encontrada" });
+  if (result.changes === 0) {
+    return res.status(404).json({ error: "Task not found" });
   }
 
-  resposta.status(204).send();
+  res.status(204).send();
 });
 
-app.listen(PORTA, function () {
-  console.log(`Servidor a correr em http://localhost:${PORTA}`);
+app.listen(PORT, function () {
+  console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -1,11 +1,11 @@
 const Database = require("better-sqlite3");
-const db = new Database("tarefas.db");
+const db = new Database("tasks.db");
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS tarefas (
+  CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    texto TEXT NOT NULL,
-    concluida INTEGER NOT NULL DEFAULT 0
+    text TEXT NOT NULL,
+    completed INTEGER NOT NULL DEFAULT 0
   )
 `);
 

@@ -1,17 +1,17 @@
-# API de Tarefas (Backend)
+# To-do REST API (Backend)
 
-API REST para gerir tarefas, feita com Node.js e Express, com persistência de dados numa base de dados SQLite. Primeiro projeto de backend.
+A REST API to manage tasks, built with Node.js and Express, storing data in an SQLite database. It was my first backend project.
 
-## Funcionalidades
+## Features
 
-- Listar todas as tarefas
-- Criar uma nova tarefa
-- Alternar o estado de uma tarefa (concluída / por fazer)
-- Apagar uma tarefa
-- Os dados persistem numa base de dados (não se perdem ao reiniciar o servidor)
-- Validação dos dados recebidos e respostas de erro adequadas
+- List all tasks
+- Create a new task
+- Toggle a task's state (completed / not completed)
+- Delete a task
+- Data is stored in a database, so it isn't lost when the server restarts
+- Input validation and proper error responses
 
-## Tecnologias
+## Technologies
 
 - Node.js
 - Express
@@ -19,48 +19,48 @@ API REST para gerir tarefas, feita com Node.js e Express, com persistência de d
 
 ## Endpoints
 
-| Método   | Rota           | Descrição                                          |
-| -------- | -------------- | -------------------------------------------------- |
-| `GET`    | `/tarefas`     | Devolve todas as tarefas                           |
-| `POST`   | `/tarefas`     | Cria uma nova tarefa (body: `{ "texto": "..." }`)  |
-| `PUT`    | `/tarefas/:id` | Alterna o estado `concluida` da tarefa com esse id |
-| `DELETE` | `/tarefas/:id` | Apaga a tarefa com esse id                         |
+| Method   | Route        | Description                                            |
+| -------- | ------------ | ------------------------------------------------------ |
+| `GET`    | `/tasks`     | Returns all tasks                                      |
+| `POST`   | `/tasks`     | Creates a new task (body: `{ "text": "..." }`)         |
+| `PUT`    | `/tasks/:id` | Toggles the `completed` state of the task with that id |
+| `DELETE` | `/tasks/:id` | Deletes the task with that id                          |
 
-## Estrutura da base de dados
+## Database structure
 
-Tabela `tarefas`:
+Table `tasks`:
 
-| Coluna      | Tipo    | Descrição                              |
-| ----------- | ------- | -------------------------------------- |
-| `id`        | INTEGER | Identificador único (auto-incremento)  |
-| `texto`     | TEXT    | Descrição da tarefa                     |
-| `concluida` | INTEGER | Estado (0 = por fazer, 1 = concluída)  |
+| Column      | Type    | Description                        |
+| ----------- | ------- | ---------------------------------- |
+| `id`        | INTEGER | Unique identifier (auto-increment) |
+| `text`      | TEXT    | Task description                   |
+| `completed` | INTEGER | State (0 = to do, 1 = completed)   |
 
-## Conceitos praticados
+## Concepts practiced
 
-- Criar um servidor com Express (`app.listen`)
-- Rotas para os métodos HTTP `GET`, `POST`, `PUT` e `DELETE`
-- Parâmetros de rota (`:id`) e leitura do corpo do pedido (`req.body`)
-- Códigos de estado HTTP (`200`, `201`, `204`, `400`, `404`)
-- Persistência com SQLite e *prepared statements* (proteção contra SQL injection)
-- Validação de dados de entrada
-- Conversão entre o formato da base de dados (0/1) e o da API (true/false)
+- Creating a server with Express (`app.listen`)
+- Routes for the `GET`, `POST`, `PUT` and `DELETE` HTTP methods
+- Route parameters (`:id`) and reading the request body (`req.body`)
+- HTTP status codes (`200`, `201`, `204`, `400`, `404`)
+- Persistence with SQLite and *prepared statements* (protection against SQL injection)
+- Validating input data
+- Converting between the database format (0/1) and the API format (true/false)
 
-## Como correr
+## How to run
 
 ```bash
 npm install
 node server.js
 ```
 
-O servidor fica disponível em `http://localhost:3000`. A base de dados (`tarefas.db`) é criada automaticamente na primeira execução.
+The server runs at `http://localhost:3000`. The database (`tasks.db`) is created automatically on the first run.
 
-## Como testar
+## How to test
 
-Os endpoints podem ser testados com o [Thunder Client](https://www.thunderclient.com/) (extensão do VSCode) ou o Postman. O `GET /tarefas` também pode ser visto diretamente no browser.
+You can test the endpoints with [Thunder Client](https://www.thunderclient.com/) (a VS Code extension) or Postman. `GET /tasks` can also be opened directly in the browser.
 
-## Próximos passos
+## Next steps
 
-- [ ] Adicionar um frontend simples que consuma esta API
-- [ ] Adicionar uma data de criação a cada tarefa
-- [ ] Publicar o servidor online (ex: Render, Railway)
+- [ ] Add a simple frontend that consumes this API
+- [ ] Add a creation date to each task
+- [ ] Deploy the server online (e.g. Render, Railway)
